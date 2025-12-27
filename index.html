@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>PD罰金・懲役計算ツール (FiveM RP)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --text: #f1f5f9;
+            --border: #334155;
+            --general: #dcfce7;
+            --small: #fef9c3;
+            --medium: #ffedd5;
+            --large: #fee2e2;
+        }
+        body { font-family: 'Segoe UI', Meiryo, sans-serif; background: var(--bg-color); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .header { position: sticky; top: 0; width: 100%; max-width: 1200px; background: var(--card-bg); padding: 20px; border-radius: 12px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border: 1px solid var(--border); margin-bottom: 20px; z-index: 100; }
+        .stat-box { text-align: center; }
+        .stat-label { font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 1200px; }
+        .category-label { grid-column: span 3; padding: 10px; font-weight: bold; font-size: 1.1rem; border-left: 4px solid var(--accent); margin-top: 10px; background: rgba(59, 130, 246, 0.1); }
+        .item { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .item:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .item.selected { background: var(--accent); border-color: #fff; }
+        .item.selected * { color: #fff !important; }
+        .item .name { font-weight: bold; margin-bottom: 5px; }
+        .item .price { font-size: 0.9rem; color: var(--accent); }
+        .item .time { font-size: 0.8rem; color: #94a3b8; }
+        .btn-copy { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-copy:active { opacity: 0.7; }
+        .btn-reset { background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="stat-box">
+        <div class="stat-label">合計罰金額</div>
+        <div class="stat-value" id="totalPrice">¥0</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-label">懲役時間 (最大値参照)</div>
+        <div class="stat-value" id="maxTime">0<span style="font-size:1rem"> 分</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn-copy" onclick="copyResult()">結果をコピー</button>
+        <button class="btn-reset" onclick="resetAll()">全リセット</button>
+    </div>
+</div>
+
+<div class="grid" id="crimeGrid"></div>
+
+<script>
+    // 罰金額(price)は画像から、懲役(time)は適宜設定（必要に応じて数値を変更してください）
+    const crimes = [
+        { cat: "一般", name: "公務執行妨害", price: 500000, time: 10 },
+        { cat: "一般", name: "道路交通法違反", price: 300000, time: 5 },
+        { cat: "一般", name: "銃刀法違反", price: 700000, time: 15 },
+        { cat: "一般", name: "薬物所持", price: 2000000, time: 20 },
+        { cat: "一般", name: "暴行罪", price: 800000, time: 15 },
+        { cat: "一般", name: "プレイヤー殺人", price: 2500000, time: 60 },
+        { cat: "一般", name: "NPC殺人罪", price: 700000, time: 20 },
+        { cat: "一般", name: "NPC車両窃盗違反", price: 800000, time: 10 },
+        { cat: "一般", name: "公務車両窃盗違反", price: 2500000, time: 30 },
+        { cat: "一般", name: "詐欺/脅迫罪", price: 1000000, time: 20 },
+        { cat: "一般", name: "業務妨害罪", price: 1500000, time: 15 },
+        { cat: "一般", name: "誘拐拉致監禁罪", price: 1000000, time: 30 },
+        { cat: "一般", name: "逃走補助罪", price: 1500000, time: 20 },
+        { cat: "小型", name: "コンビニ強盗罪", price: 2500000, time: 25 },
+        { cat: "小型", name: "フリーカ(銀行)強盗", price: 3500000, time: 35 },
+        { cat: "小型", name: "ATM強盗", price: 3500000, time: 20 },
+        { cat: "小型", name: "宝石強盗", price: 6000000, time: 40 },
+        { cat: "中型", name: "絵画強盗", price: 4000000, time: 45 },
+        { cat: "中型", name: "洞窟強盗", price: 4000000, time: 45 },
+        { cat: "大型", name: "客船強盗", price: 5000000, time: 50 },
+        { cat: "大型", name: "オイルリグ強盗", price: 6000000, time: 60 },
+        { cat: "大型", name: "飛行場強盗", price: 5000000, time: 50 },
+        { cat: "大型", name: "ユニオン強盗", price: 5000000, time: 60 },
+        { cat: "大型", name: "アーティファクト強盗", price: 6000000, time: 60 }
+    ];
+
+    let selectedIdx = new Set();
+
+    function render() {
+        const grid = document.getElementById('crimeGrid');
+        grid.innerHTML = '';
+        let lastCat = "";
+
+        crimes.forEach((c, i) => {
+            if (c.cat !== lastCat) {
+                const catDiv = document.createElement('div');
+                catDiv.className = 'category-label';
+                catDiv.innerText = `【${c.cat}犯罪】`;
+                grid.appendChild(catDiv);
+                lastCat = c.cat;
+            }
+
+            const item = document.createElement('div');
+            item.className = `item ${selectedIdx.has(i) ? 'selected' : ''}`;
+            item.innerHTML = `
+                <span class="name">${c.name}</span>
+                <span class="price">¥${c.price.toLocaleString()}</span>
+                <span class="time">懲役: ${c.time}分</span>
+            `;
+            item.onclick = () => toggle(i);
+            grid.appendChild(item);
+        });
+        calculate();
+    }
+
+    function toggle(i) {
+        selectedIdx.has(i) ? selectedIdx.delete(i) : selectedIdx.add(i);
+        render();
+    }
+
+    function calculate() {
+        let total = 0;
+        let maxT = 0;
+        selectedIdx.forEach(i => {
+            total += crimes[i].price;
+            if (crimes[i].time > maxT) maxT = crimes[i].time;
+        });
+        document.getElementById('totalPrice').innerText = `¥${total.toLocaleString()}`;
+        document.getElementById('maxTime').innerHTML = `${maxT}<span style="font-size:1rem"> 分</span>`;
+    }
+
+    function resetAll() {
+        selectedIdx.clear();
+        render();
+    }
+
+    function copyResult() {
+        let total = 0;
+        let maxT = 0;
+        let names = [];
+        selectedIdx.forEach(i => {
+            total += crimes[i].price;
+            if (crimes[i].time > maxT) maxT = crimes[i].time;
+            names.push(crimes[i].name);
+        });
+        if(names.length === 0) return alert("罪状が選択されていません");
+        const text = `【調書】\n罪状：${names.join(', ')}\n合計罰金：¥${total.toLocaleString()}\n懲役：${maxT}分`;
+        navigator.clipboard.writeText(text);
+        alert("コピーしました！");
+    }
+
+    render();
+</script>
+</body>
+</html>
