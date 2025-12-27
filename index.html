@@ -56,30 +56,30 @@
 <script>
     // 罰金額(price)は画像から、懲役(time)は適宜設定（必要に応じて数値を変更してください）
     const crimes = [
-        { cat: "一般", name: "公務執行妨害", price: 500000, time: 10 },
-        { cat: "一般", name: "道路交通法違反", price: 300000, time: 5 },
-        { cat: "一般", name: "銃刀法違反", price: 700000, time: 15 },
-        { cat: "一般", name: "薬物所持", price: 2000000, time: 20 },
-        { cat: "一般", name: "暴行罪", price: 800000, time: 15 },
-        { cat: "一般", name: "プレイヤー殺人", price: 2500000, time: 60 },
-        { cat: "一般", name: "NPC殺人罪", price: 700000, time: 20 },
-        { cat: "一般", name: "NPC車両窃盗違反", price: 800000, time: 10 },
-        { cat: "一般", name: "公務車両窃盗違反", price: 2500000, time: 30 },
-        { cat: "一般", name: "詐欺/脅迫罪", price: 1000000, time: 20 },
-        { cat: "一般", name: "業務妨害罪", price: 1500000, time: 15 },
-        { cat: "一般", name: "誘拐拉致監禁罪", price: 1000000, time: 30 },
-        { cat: "一般", name: "逃走補助罪", price: 1500000, time: 20 },
-        { cat: "小型", name: "コンビニ強盗罪", price: 2500000, time: 25 },
-        { cat: "小型", name: "フリーカ(銀行)強盗", price: 3500000, time: 35 },
-        { cat: "小型", name: "ATM強盗", price: 3500000, time: 20 },
-        { cat: "小型", name: "宝石強盗", price: 6000000, time: 40 },
-        { cat: "中型", name: "絵画強盗", price: 4000000, time: 45 },
-        { cat: "中型", name: "洞窟強盗", price: 4000000, time: 45 },
-        { cat: "大型", name: "客船強盗", price: 5000000, time: 50 },
-        { cat: "大型", name: "オイルリグ強盗", price: 6000000, time: 60 },
-        { cat: "大型", name: "飛行場強盗", price: 5000000, time: 50 },
-        { cat: "大型", name: "ユニオン強盗", price: 5000000, time: 60 },
-        { cat: "大型", name: "アーティファクト強盗", price: 6000000, time: 60 }
+        { cat: "一般", name: "公務執行妨害", price: 500000, time: - },
+        { cat: "一般", name: "道路交通法違反", price: 300000, time: - },
+        { cat: "一般", name: "銃刀法違反", price: 700000, time: - },
+        { cat: "一般", name: "薬物所持", price: 2000000, time: - },
+        { cat: "一般", name: "暴行罪", price: 800000, time: - },
+        { cat: "一般", name: "プレイヤー殺人", price: 2500000, time: - },
+        { cat: "一般", name: "NPC殺人罪", price: 700000, time: - },
+        { cat: "一般", name: "NPC車両窃盗違反", price: 800000, time: - },
+        { cat: "一般", name: "公務車両窃盗違反", price: 2500000, time: - },
+        { cat: "一般", name: "詐欺/脅迫罪", price: 1000000, time: - },
+        { cat: "一般", name: "業務妨害罪", price: 1500000, time: - },
+        { cat: "一般", name: "誘拐拉致監禁罪", price: 1000000, time: - },
+        { cat: "一般", name: "逃走補助罪", price: 1500000, time: - },
+        { cat: "小型", name: "コンビニ強盗罪", price: 2500000, time: - },
+        { cat: "小型", name: "フリーカ(銀行)強盗", price: 3500000, time: - },
+        { cat: "小型", name: "ATM強盗", price: 3500000, time: - },
+        { cat: "小型", name: "宝石強盗", price: 6000000, time: - },
+        { cat: "中型", name: "絵画強盗", price: 4000000, time: - },
+        { cat: "中型", name: "洞窟強盗", price: 4000000, time: - },
+        { cat: "大型", name: "客船強盗", price: 5000000, time: - },
+        { cat: "大型", name: "オイルリグ強盗", price: 6000000, time: - },
+        { cat: "大型", name: "飛行場強盗", price: 5000000, time: - },
+        { cat: "大型", name: "ユニオン強盗", price: 5000000, time: - },
+        { cat: "大型", name: "アーティファクト強盗", price: 6000000, time: - }
     ];
 
     let selectedIdx = new Set();
@@ -150,4 +150,5 @@
     render();
 </script>
 </body>
+
 </html>
